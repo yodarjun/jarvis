@@ -141,7 +141,7 @@ def chat():
                 slow_print(resp.completion)
                 reply = resp.completion
             elif chosen == "gemini":
-                model = genai.GenerativeModel('gemini-pro')
+                model = genai.GenerativeModel('gemini-2.5-flash-preview-05-20')
                 history = [{"role": m["role"], "parts": [m["content"]]} for m in messages]
                 resp = model.generate_content(history)
                 slow_print(resp.text)
