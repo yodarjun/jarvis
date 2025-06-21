@@ -1,40 +1,78 @@
+# Jarvis HAL
 
-# Jarvis HAL v3
+A multi-model AI assistant with personality, supporting OpenAI, Anthropic Claude, and Google Gemini models.
 
-A HAL-inspired AI chat assistant in your macOS terminal. Powered by OpenAI, Claude, and Gemini.
+## Features
+
+- 🤖 Multiple AI providers support (OpenAI, Anthropic Claude, Google Gemini)
+- 🎨 Rich terminal interface with syntax highlighting
+- ⚡ Async streaming responses
+- 🔧 Easy configuration management
+- 📝 Comprehensive logging
+- 🎯 Type-safe with Pydantic models
 
 ## Installation
 
-Clone this repo:
-
 ```bash
-git clone <your-repo-url>
+# Clone the repository
+git clone https://github.com/yourusername/jarvis-hal.git
 cd jarvis-hal
-pip install .
+
+# Install the package
+pip install -e .
 ```
 
-## Setup
+## Configuration
 
-Run:
+Before using Jarvis, you need to configure your API keys:
 
 ```bash
 jarvis setup
 ```
 
-This will install dependencies and ask for your API keys.
+This will guide you through setting up:
+- OpenAI API key
+- Anthropic API key
+- Google Gemini API key
+- Default provider
+- Model settings
+- Temperature and token limits
 
 ## Usage
 
-After setup, simply launch:
+Start a chat session:
 
 ```bash
-jarvis
+jarvis chat
 ```
 
-## Features
+### Keyboard Shortcuts
 
-- Random LLM selection per session
-- Colorful HAL interface
-- Typewriter output
-- Keyboard shortcuts: Ctrl+L (clear), Ctrl+C (exit)
-- Interactive config
+- `Ctrl+L`: Clear the screen
+- `Ctrl+C`: Exit the chat session
+
+## Development
+
+### Project Structure
+
+```
+jarvis-hal/
+├── jarvis/
+│   ├── __init__.py
+│   ├── cli.py          # Command-line interface
+│   ├── config.py       # Configuration management
+│   └── providers.py    # AI provider implementations
+├── setup.py
+└── README.md
+```
+
+### Requirements
+
+- Python 3.8+
+- OpenAI API key
+- Anthropic API key (optional)
+- Google Gemini API key (optional)
+
+## License
+
+MIT License - see LICENSE file for details

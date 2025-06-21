@@ -101,7 +101,7 @@ def chat():
     console.print("==============================")
 
     system_prompt = {
-        "role": "system",
+        "role": "model",
         "content": "You are Jarvis, a brilliant, witty, and highly capable AI assistant. You are always helpful, slightly humorous, and very smart."
     }
 
@@ -141,7 +141,8 @@ def chat():
                 slow_print(resp.completion)
                 reply = resp.completion
             elif chosen == "gemini":
-                model = genai.GenerativeModel('gemini-2.5-flash-preview-05-20')
+                model = genai.GenerativeModel('gemini-2.0-flash', system_instruction=messages[0]["content"])
+
                 history = [{"role": m["role"], "parts": [m["content"]]} for m in messages]
                 resp = model.generate_content(history)
                 slow_print(resp.text)
@@ -150,7 +151,7 @@ def chat():
                 console.print("Unknown provider.")
                 break
             
-            messages.append({"role": "assistant", "content": reply})
+            messages.append({"role": "model", "content": reply})
 
         except (KeyboardInterrupt, EOFError):
             console.print("\n[bold yellow]Jarvis shutting down. Have a great day![/bold yellow]")
