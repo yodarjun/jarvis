@@ -2,6 +2,7 @@
 
 import asyncio
 import random
+import time
 from typing import List, Dict, Optional
 import typer
 from rich.console import Console
@@ -17,6 +18,16 @@ from .providers import get_provider
 # Initialize Typer app
 app = typer.Typer(help="Jarvis HAL - A multi-model AI assistant with personality")
 console = Console()
+
+# ASCII Art for JARVIS
+JARVIS_ART = """
+  ██████║ █████╗ ██████╗ ██╗   ██╗██╗███████╗
+     ██║ ██╔══██╗██╔══██╗██║   ██║██║██╔════╝
+     ██║ ███████║██████╔╝██║   ██║██║███████╗
+     ██║ ██╔══██║██╔══██╗╚██╗ ██╔╝██║╚════██║
+ ██║ ██║ ██║  ██║██║  ██║ ╚████╔╝ ██║███████║
+   ██║   ╚═╝  ╚═╝╚═╝  ╚═╝  ╚═══╝  ╚═╝╚══════╝
+"""
 
 def setup_logging():
     """Configure logging."""
@@ -52,6 +63,12 @@ def setup():
     config.save()
     console.print("\n[bold green]✅ Configuration saved successfully![/bold green]")
 
+def print_character_by_character(text: str, delay: float = 0.01):
+    """Print text character by character with a specified delay."""
+    for char in text:
+        print(char, end="", flush=True)
+        time.sleep(delay)
+
 def chat_loop(provider, messages: List[Dict[str, str]], session: PromptSession, kb: KeyBindings):
     """Main chat loop."""
     while True:
@@ -65,7 +82,7 @@ def chat_loop(provider, messages: List[Dict[str, str]], session: PromptSession, 
             
             full_response = ""
             for chunk in provider.generate_response_sync(messages):
-                print(chunk, end="", flush=True)
+                print_character_by_character(chunk, delay=0.005)  # Fast character printing
                 full_response += chunk
             print("\n")
             
@@ -91,13 +108,16 @@ def chat(
         raise typer.Exit(1)
     
     chosen = provider if provider in available_providers else random.choice(available_providers)
+
+    # Print ASCII art
+    console.print(JARVIS_ART, style="bold blue")
     console.print("==============================")
-    console.print(f"[bold red]🟥 HAL (Jarvis) online. Provider: {chosen.upper()}[/bold red]")
+    console.print(f"[bold red]🟥 Jarvis online. Provider: {chosen.upper()}[/bold red]")
     console.print("==============================")
     
     system_prompt = {
         "role": "system",
-        "content": "You are Jarvis, a brilliant, witty, and highly capable AI assistant. You are always helpful, slightly humorous, and very smart."
+        "content": "You are Jarvis, a brilliant AI assistant with a witty personality. Keep responses short, precise, and to the point. Be helpful and slightly witty, but concise."
     }
     
     messages: List[Dict[str, str]] = [system_prompt]
