@@ -1,4 +1,4 @@
-# Jarvis HAL
+# Jarvis
 
 A multi-model AI assistant with personality, supporting OpenAI, Anthropic Claude, and Google Gemini models.
 
