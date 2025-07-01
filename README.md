@@ -15,8 +15,8 @@ A multi-model AI assistant with personality, supporting OpenAI, Anthropic Claude
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/jarvis-hal.git
-cd jarvis-hal
+git clone https://github.com/yourusername/jarvis.git
+cd jarvis
 
 # Install the package
 pip install -e .
@@ -56,7 +56,7 @@ jarvis chat
 ### Project Structure
 
 ```
-jarvis-hal/
+jarvis/
 ├── jarvis/
 │   ├── __init__.py
 │   ├── cli.py          # Command-line interface
