@@ -46,6 +46,23 @@ Start a chat session:
 jarvis chat
 ```
 
+### LLM Shortcuts
+
+You can specify which AI model to use for each message by prefixing your input with a shortcut:
+
+- `g:` - Use Google Gemini
+- `o:` - Use OpenAI (ChatGPT)
+- `c:` - Use Anthropic Claude
+
+Examples:
+```
+g: What's the weather like today?
+o: Write a Python function to sort a list
+c: Explain quantum computing in simple terms
+```
+
+If the requested model is not configured or unavailable, Jarvis will automatically use an available model and notify you.
+
 ### Keyboard Shortcuts
 
 - `Ctrl+L`: Clear the screen

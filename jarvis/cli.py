@@ -13,7 +13,7 @@ from loguru import logger
 from pydantic import SecretStr
 
 from .config import Config
-from .providers import get_provider
+from .providers import get_provider, OpenAIProvider, AnthropicProvider, GeminiProvider
 
 # Initialize Typer app
 app = typer.Typer(help="Jarvis HAL - A multi-model AI assistant with personality")
@@ -69,19 +69,57 @@ def print_character_by_character(text: str, delay: float = 0.01):
         print(char, end="", flush=True)
         time.sleep(delay)
 
-def chat_loop(provider, messages: List[Dict[str, str]], session: PromptSession, kb: KeyBindings):
+def chat_loop(provider, messages: List[Dict[str, str]], session: PromptSession, kb: KeyBindings, config: Config):
     """Main chat loop."""
     while True:
         try:
             # Use Rich's console for colored output
             console.print("You:", style="cyan", end=" ")
             user_input = session.prompt("", key_bindings=kb)
+            
+            # Check for LLM shortcuts
+            current_provider = provider
+            original_input = user_input
+            
+            if user_input.startswith("g:"):
+                user_input = user_input[2:].strip()
+                if "gemini" in config.get_available_providers():
+                    current_provider = get_provider("gemini", config.model_dump())
+                else:
+                    console.print("[bold yellow]⚠️  Gemini is unavailable currently. Using available provider.[/bold yellow]")
+            elif user_input.startswith("o:"):
+                user_input = user_input[2:].strip()
+                if "openai" in config.get_available_providers():
+                    current_provider = get_provider("openai", config.model_dump())
+                else:
+                    console.print("[bold yellow]⚠️  OpenAI is unavailable currently. Using available provider.[/bold yellow]")
+            elif user_input.startswith("c:"):
+                user_input = user_input[2:].strip()
+                if "claude" in config.get_available_providers():
+                    current_provider = get_provider("claude", config.model_dump())
+                else:
+                    console.print("[bold yellow]⚠️  Claude is unavailable currently. Using available provider.[/bold yellow]")
+            
+            # If no input after shortcut, skip this iteration
+            if not user_input:
+                continue
+                
             messages.append({"role": "user", "content": user_input})
             
-            console.print("Jarvis:", style="bold red", end=" ")
+            # Show which provider is being used (if different from default)
+            provider_name = "Jarvis"
+            if current_provider != provider:
+                if isinstance(current_provider, OpenAIProvider):
+                    provider_name = "Jarvis (OpenAI)"
+                elif isinstance(current_provider, AnthropicProvider):
+                    provider_name = "Jarvis (Claude)"
+                elif isinstance(current_provider, GeminiProvider):
+                    provider_name = "Jarvis (Gemini)"
+            
+            console.print(f"{provider_name}:", style="bold red", end=" ")
             
             full_response = ""
-            for chunk in provider.generate_response_sync(messages):
+            for chunk in current_provider.generate_response_sync(messages):
                 print_character_by_character(chunk, delay=0.005)  # Fast character printing
                 full_response += chunk
             print("\n")
@@ -115,6 +153,22 @@ def chat(
     console.print(f"[bold red]🟥 Jarvis online. Provider: {chosen.upper()}[/bold red]")
     console.print("==============================")
     
+    # Show available shortcuts
+    available_providers = config.get_available_providers()
+    shortcuts_info = []
+    if "openai" in available_providers:
+        shortcuts_info.append("o: for OpenAI")
+    if "claude" in available_providers:
+        shortcuts_info.append("c: for Claude")
+    if "gemini" in available_providers:
+        shortcuts_info.append("g: for Gemini")
+    
+    if shortcuts_info:
+        console.print("\n[bold cyan]Available shortcuts:[/bold cyan]")
+        for shortcut in shortcuts_info:
+            console.print(f"  • {shortcut}")
+        console.print("")
+    
     system_prompt = {
         "role": "system",
         "content": "You are Jarvis, a brilliant AI assistant with a witty personality. Keep responses short, precise, and to the point. Be helpful and slightly witty, but concise."
@@ -129,7 +183,7 @@ def chat(
         console.clear()
     
     provider = get_provider(chosen, config.model_dump())
-    chat_loop(provider, messages, session, kb)
+    chat_loop(provider, messages, session, kb, config)
 
 def main():
     """Main entry point."""
